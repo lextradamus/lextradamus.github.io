@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Local Air Measurements</title>
+	<link rel="stylesheet" href="/stylesheets/main.css">
+</head>
+<body>
+	<h1>Current Air Values</h1>
+	<h2><span id="time" style="color:black;font-weight:bold">xxx</span></h2>
+	<h2><span id="data" style="color:black;font-weight:bold"></span></h2>
+	<button class="button button1" onclick='getLatestReading("latest")'>Refresh</button>
+</body>
+<script>
+	function timeConverter(UNIX_timestamp){
+		var a = new Date(UNIX_timestamp * 1000);
+		var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+		var year = a.getFullYear();
+		var month = months[a.getMonth()];
+		var date = a.getDate();
+		var hour = a.getHours();
+		var min = a.getMinutes();
+		var sec = a.getSeconds();
+		var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+		return time;
+	}
+	function getLatestReading(theUrl)
+	{
+		var xmlHttp = new XMLHttpRequest();
+		xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+		xmlHttp.send( null );
+		const obj = JSON.parse(xmlHttp.responseText);
+		document.getElementById("time").textContent=timeConverter(obj[0].timestamp);
+		let text = "";
+		obj.forEach(displayRes);
+		function displayRes(value) {
+			text += value.sensorLocation + " " + value.sensorType + " " + value.sensorValue + "<br>";
+		}
+		document.getElementById("data").innerHTML=text;
+		return xmlHttp.responseText;
+	}
+</script>
+</html>
